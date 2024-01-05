@@ -7,7 +7,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from "react-router-dom";
 export default function CreateListing() {
   const navigate = useNavigate();
   const params = useParams();
@@ -31,22 +31,22 @@ export default function CreateListing() {
   const [uploading, setuploading] = useState(false);
   const [error, seterror] = useState(false);
   const [loading, setloading] = useState(false);
-//   console.log(formdata);
+  //   console.log(formdata);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchListing = async () => {
-        const listingId = params.listingId;
-        // console.log(listingId);
-        const res = await fetch(`/api/listing/get/${listingId}`);
-        const data = await res.json();
-        if(data.success === false){
-            console.log(data.message);
-            return;
-        }
-        setformdata(data);
+      const listingId = params.listingId;
+      // console.log(listingId);
+      const res = await fetch(`/api/listing/get/${listingId}`);
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setformdata(data);
     };
     fetchListing();
-}, [])
+  }, []);
 
   const handleImageSubmit = (e) => {
     // e.preventDefault();
@@ -135,14 +135,16 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if(formdata.imageURLs.length < 1) return seterror("You must upload at least one image")
-      if(+formdata.regularPrice < +formdata.discountedPrice) return seterror("Regular Price must be more than Discounted Price")
+      if (formdata.imageURLs.length < 1)
+        return seterror("You must upload at least one image");
+      if (+formdata.regularPrice < +formdata.discountedPrice)
+        return seterror("Regular Price must be more than Discounted Price");
       setloading(true);
       seterror(false);
       const res = await fetch(`/api/listing/update/${params.listingId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formdata,
@@ -154,7 +156,7 @@ useEffect(() => {
       if (data.success === false) {
         seterror(data.message);
       }
-      navigate(`/listing/${data._id}`)
+      navigate(`/listing/${data._id}`);
     } catch (error) {
       seterror(error.message);
       setloading(false);
@@ -288,27 +290,31 @@ useEffect(() => {
               />
               <div className="flex flex-col items-center">
                 <p>Regular Price</p>
-                <span className="text-xs">($ / month)</span>
+                {formdata.type === "rent" && (
+                  <span className="text-xs">($ / month)</span>
+                )}
               </div>
             </div>
             {formdata.offer && (
               <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountedPrice"
-                min="0"
-                max="10000000"
-                required
-                className="p-3 border border-gray-300 rounded-lg"
-                onChange={handleChange}
-                value={formdata.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>Discounted Price</p>
-                <span className="text-xs">($ / month)</span>
+                <input
+                  type="number"
+                  id="discountedPrice"
+                  min="0"
+                  max="10000000"
+                  required
+                  className="p-3 border border-gray-300 rounded-lg"
+                  onChange={handleChange}
+                  value={formdata.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discounted Price</p>
+                  {formdata.type === "rent" && (
+                    <span className="text-xs">($ / month)</span>
+                  )}
+                </div>
               </div>
-            </div>
-            )} 
+            )}
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -359,7 +365,10 @@ useEffect(() => {
                 </button>
               </div>
             ))}
-          <button disabled={loading || uploading} className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+          <button
+            disabled={loading || uploading}
+            className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          >
             {loading ? "Updating..." : "Update Listing"}
           </button>
           {error && <p className="text-red-700">{error}</p>}

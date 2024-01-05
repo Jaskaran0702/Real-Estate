@@ -7,7 +7,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 export default function CreateListing() {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
@@ -119,14 +119,16 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if(formdata.imageURLs.length < 1) return seterror("You must upload at least one image")
-      if(+formdata.regularPrice < +formdata.discountedPrice) return seterror("Regular Price must be more than Discounted Price")
+      if (formdata.imageURLs.length < 1)
+        return seterror("You must upload at least one image");
+      if (+formdata.regularPrice < +formdata.discountedPrice)
+        return seterror("Regular Price must be more than Discounted Price");
       setloading(true);
       seterror(false);
-      const res = await fetch('/api/listing/create', {
-        method: 'POST',
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formdata,
@@ -138,7 +140,7 @@ export default function CreateListing() {
       if (data.success === false) {
         seterror(data.message);
       }
-      navigate(`/listing/${data._id}`)
+      navigate(`/listing/${data._id}`);
     } catch (error) {
       seterror(error.message);
       setloading(false);
@@ -272,27 +274,31 @@ export default function CreateListing() {
               />
               <div className="flex flex-col items-center">
                 <p>Regular Price</p>
-                <span className="text-xs">($ / month)</span>
+                {formdata.type === "rent" && (
+                  <span className="text-xs">($ / month)</span>
+                )}
               </div>
             </div>
             {formdata.offer && (
               <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountedPrice"
-                min="0"
-                max="10000000"
-                required
-                className="p-3 border border-gray-300 rounded-lg"
-                onChange={handleChange}
-                value={formdata.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>Discounted Price</p>
-                <span className="text-xs">($ / month)</span>
+                <input
+                  type="number"
+                  id="discountedPrice"
+                  min="0"
+                  max="10000000"
+                  required
+                  className="p-3 border border-gray-300 rounded-lg"
+                  onChange={handleChange}
+                  value={formdata.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discounted Price</p>
+                  {formdata.type === "rent" && (
+                    <span className="text-xs">($ / month)</span>
+                  )}
+                </div>
               </div>
-            </div>
-            )} 
+            )}
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -343,7 +349,10 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
-          <button disabled={loading || uploading} className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+          <button
+            disabled={loading || uploading}
+            className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          >
             {loading ? "Creating..." : "Create Listing"}
           </button>
           {error && <p className="text-red-700">{error}</p>}
